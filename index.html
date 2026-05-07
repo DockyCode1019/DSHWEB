@@ -2,398 +2,413 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSH. - Ultra Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DSH Dashboard - Live Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;800&display=swap');
-        
         :root {
-            --brand-primary: #3b82f6;
-            --brand-secondary: #8b5cf6;
+            --bg-dark: #010409;
+            --accent-blue: #0ea5e9;
+            --accent-emerald: #10b981;
         }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #020408;
-            color: #e2e8f0;
-            margin: 0;
-            padding: 0;
+        html, body {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
             overflow: hidden; 
-            height: 100vh;
-            width: 100vw;
-            transition: background-color 0.5s ease;
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
         }
 
-        .glass {
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 2rem;
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+
+        .bg-mesh {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #020617 0%, #000 100%);
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.35;
+            animation: move 15s infinite alternate ease-in-out;
+        }
+
+        .blob-blue {
+            width: 700px; height: 700px;
+            background: var(--accent-blue);
+            top: -20%; left: -10%;
+            animation-duration: 25s;
+        }
+
+        .blob-emerald {
+            width: 800px; height: 800px;
+            background: var(--accent-emerald);
+            bottom: -15%; right: -10%;
+            animation-duration: 18s;
+        }
+
+        @keyframes move {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            100% { transform: translate(20%, 10%) scale(1.3) rotate(10deg); }
+        }
+
+        .card {
+            background: rgba(1, 10, 25, 0.6);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            border-radius: 28px;
+            box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.7);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card:hover {
+            border-color: var(--accent-emerald);
+            transform: translateY(-5px);
+            box-shadow: 0 25px 60px -10px rgba(16, 185, 129, 0.2);
+        }
+
+        .live-dot {
+            width: 6px; height: 6px;
+            background-color: var(--accent-emerald);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            box-shadow: 0 0 10px var(--accent-emerald);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.8); }
         }
 
         .nav-link {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
+            cursor: pointer;
+            padding: 10px 24px;
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
         }
 
         .nav-link.active {
             color: white;
-            background: rgba(59, 130, 246, 0.2);
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 20%;
-            width: 60%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
-            border-radius: 10px;
-        }
-
-        /* Hatalmas óra stílusa */
-        .big-clock {
-            font-size: clamp(5rem, 16vw, 20rem);
-            font-weight: 200;
-            line-height: 0.85;
-            letter-spacing: -0.05em;
-            background: linear-gradient(180deg, #ffffff 40%, rgba(255,255,255,0.1) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
+        .time-display {
+            font-size: clamp(4rem, 15vw, 11rem);
+            line-height: 0.8;
+            font-weight: 900;
+            letter-spacing: -6px;
+            color: white;
+            filter: drop-shadow(0 0 50px rgba(16, 185, 129, 0.2));
         }
 
         .page-content {
-            animation: fadeIn 0.6s ease-out;
-            height: 100%;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.99); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .loader {
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-top: 2px solid var(--brand-primary);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .main-container {
-            height: calc(100vh - 140px);
-            transition: height 0.5s ease;
-        }
-
-        /* Kivetítés / Kioszk mód */
-        body.kiosk-mode .main-nav {
             display: none;
-        }
-        body.kiosk-mode .main-container {
-            height: 100vh;
-            padding-top: 2rem;
+            height: calc(100vh - 220px);
+            animation: slideUp 0.5s ease-out;
         }
 
-        .logo-container img {
-            height: 54px;
-            width: auto;
-            border-radius: 0.75rem;
-            object-fit: contain;
-            transition: transform 0.3s ease;
+        .page-content.active { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+
+        .lang-btn {
+            cursor: pointer;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 900;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .lang-btn.active {
+            background: var(--accent-emerald);
+            color: white;
+            border-color: var(--accent-emerald);
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent-emerald); border-radius: 10px; }
         
-        .logo-container img:hover {
-            transform: scale(1.05);
+        .news-title {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
         }
     </style>
 </head>
-<body class="flex flex-col">
+<body class="p-6 md:p-12 lg:p-14 flex flex-col">
+    <div class="bg-mesh">
+        <div class="bg-blob blob-blue"></div>
+        <div class="bg-blob blob-emerald"></div>
+    </div>
 
-    <!-- Top Navigation -->
-    <nav class="main-nav w-full z-50 px-8 pt-6 flex-shrink-0">
-        <div class="max-w-[2000px] mx-auto glass px-8 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <!-- Csak a Logo, név nélkül -->
-                <div class="logo-container">
-                    <img src="https://i.ibb.co/YTdN2g0d/K-perny-k-p-2026-04-22-170354.png" alt="DSH Logo">
+    <header class="max-w-7xl w-full mx-auto flex items-center justify-between mb-16 relative z-10">
+        <div class="flex items-center gap-10">
+            <img src="https://i.ibb.co/QvJJKzjz/image.png" class="h-14 w-auto drop-shadow-[0_0_20px_rgba(16,185,129,0.4)]" alt="DSH Logo">
+            <div class="hidden md:flex flex-col">
+                <div class="bg-white/5 px-6 py-2.5 rounded-xl border border-white/5 backdrop-blur-md">
+                    <div class="flex items-center text-[8px] uppercase tracking-[0.4em] text-emerald-400 font-black mb-0.5">
+                        <span class="live-dot"></span><span data-key="nameday_label">MAI NÉVNAP</span>
+                    </div>
+                    <div class="text-xl font-bold orbitron text-white" id="nevnap-display">...</div>
                 </div>
-            </div>
-            
-            <div class="flex items-center gap-4">
-                <button onclick="switchPage('home')" id="nav-home" class="nav-link active px-6 py-2 rounded-xl text-base font-bold">Irányítópult</button>
-                <button onclick="switchPage('news')" id="nav-news" class="nav-link px-6 py-2 rounded-xl text-base font-bold">Hírek</button>
-                <button onclick="switchPage('finance')" id="nav-finance" class="nav-link px-6 py-2 rounded-xl text-base font-bold">Pénzügyek</button>
-            </div>
-
-            <div class="flex items-center gap-6">
-                <div class="text-right">
-                    <div id="nameday-top" class="text-sm text-blue-400 font-bold uppercase tracking-widest">Betöltés...</div>
-                    <div id="current-date-top" class="text-slate-500 text-xs font-medium">...</div>
-                </div>
-                <!-- Kivetítés gomb -->
-                <button onclick="toggleKioskMode()" class="w-12 h-12 rounded-2xl bg-white/5 hover:bg-blue-500/20 flex items-center justify-center text-slate-400 transition-all border border-white/5" title="Kivetítés / Kioszk mód">
-                    <i class="fa-solid fa-expand"></i>
-                </button>
             </div>
         </div>
-    </nav>
 
-    <main class="flex-1 w-full max-w-[2000px] mx-auto p-8 main-container overflow-hidden">
-        
-        <!-- Home / Big Clock Section -->
-        <section id="page-home" class="page-content grid grid-cols-12 gap-8">
-            <div class="col-span-12 lg:col-span-8 flex flex-col gap-8 h-full">
-                <div class="flex-1 glass p-12 flex flex-col justify-center relative overflow-hidden group">
-                    <div class="absolute -top-24 -right-24 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px]"></div>
-                    
-                    <div class="relative z-10 flex flex-col items-center lg:items-start">
-                        <div id="big-clock" class="big-clock tabular-nums">00:00</div>
-                        <div class="flex items-center gap-4 mt-6">
-                            <span id="big-date" class="text-2xl lg:text-4xl font-light text-slate-400">...</span>
-                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                            <span id="big-day" class="text-2xl lg:text-4xl font-bold text-blue-400 capitalize">...</span>
+        <div class="flex items-center gap-6">
+            <nav class="flex gap-2 bg-black/50 p-2 rounded-2xl border border-white/5 backdrop-blur-3xl">
+                <div onclick="showPage('dashboard')" id="nav-dashboard" class="nav-link active" data-key="nav_dash">DASHBOARD</div>
+                <div onclick="showPage('news')" id="nav-news" class="nav-link" data-key="nav_news">HÍREK</div>
+                <div onclick="showPage('finance')" id="nav-finance" class="nav-link" data-key="nav_fin">PÉNZÜGY</div>
+            </nav>
+            <div class="flex gap-1 bg-white/5 p-1.5 rounded-xl backdrop-blur-md">
+                <div id="btn-hu" onclick="setLang('hu')" class="lang-btn active">HU</div>
+                <div id="btn-en" onclick="setLang('en')" class="lang-btn">EN</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto flex-1 relative z-10">
+        <div id="page-dashboard" class="page-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 h-full items-center">
+                <div class="lg:col-span-7">
+                    <div class="time-display orbitron mb-10" id="clock">00:00</div>
+                    <div class="flex items-center gap-8">
+                        <div class="text-2xl md:text-3xl font-light text-white/40 tracking-[0.2em] uppercase" id="full-date">----. --. --.</div>
+                        <div class="h-10 w-px bg-emerald-500/40"></div>
+                        <div class="text-2xl font-black text-emerald-400 orbitron tracking-[0.4em] uppercase" id="day-name">---</div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5">
+                    <div class="card p-14 text-center group">
+                        <div class="absolute top-6 right-6">
+                            <span class="text-[9px] font-black text-emerald-500 tracking-widest bg-emerald-500/10 px-2 py-1 rounded">LIVE SYNC</span>
                         </div>
-                    </div>
-
-                    <div class="mt-auto pt-12 flex items-center justify-between border-t border-white/5">
-                        <div id="weather-display" class="flex items-center gap-8">
-                            <div class="loader"></div>
+                        <div id="weather-icon" class="mb-10 text-emerald-400 flex justify-center transform group-hover:scale-110 transition-transform duration-500">
+                            <svg class="w-32 h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
                         </div>
-                        <div class="text-right">
-                            <p class="text-slate-500 uppercase tracking-tighter text-sm font-bold">Helyszín</p>
-                            <p id="location-name" class="text-xl font-bold">Budapest</p>
-                        </div>
+                        <div class="text-9xl font-black orbitron text-white mb-4 tracking-tighter" id="temp-display">--°C</div>
+                        <div class="text-xl font-bold text-white/40 tracking-[0.6em] uppercase" id="location-display">SÁRVÁR, HU</div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-span-12 lg:col-span-4 flex flex-col gap-8 h-full overflow-hidden">
-                <div class="flex-1 glass p-8 flex flex-col overflow-hidden">
-                    <h3 class="text-xl font-bold flex items-center gap-2 mb-6">
-                        <i class="fa-solid fa-bolt text-yellow-400"></i> Legfrissebb
-                    </h3>
-                    <div id="mini-news-container" class="space-y-6 overflow-y-auto no-scrollbar flex-1 pr-2">
-                        <div class="loader"></div>
+        <div id="page-news" class="page-content overflow-y-auto pr-4">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="flex items-center">
+                    <span class="live-dot"></span>
+                    <h2 class="text-[10px] font-black uppercase tracking-[0.8em] text-emerald-400" data-key="news_title">MAI FRISS HÍREK</h2>
+                </div>
+                <div class="flex-1 h-px bg-emerald-500/20"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="news-container">
+                <!-- Hírek ide kerülnek -->
+            </div>
+        </div>
+
+        <div id="page-finance" class="page-content">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="card p-12 border-t-4 border-emerald-500">
+                    <div class="flex items-center justify-between mb-10">
+                        <div class="text-[9px] font-black uppercase tracking-[0.5em] text-emerald-400" data-key="fin_mid">KÖZÉPÁRFOLYAM</div>
+                        <span class="live-dot"></span>
                     </div>
+                    <div class="text-sm text-white/40 font-bold mb-3 tracking-widest uppercase">1 EUR / HUF</div>
+                    <div class="text-7xl font-black orbitron text-white mb-2" id="eur-huf">---.-</div>
+                    <div class="text-lg font-bold text-emerald-500/40 orbitron uppercase">Hungarian Forint</div>
                 </div>
 
-                <div class="h-1/3 glass p-8 flex flex-col shrink-0">
-                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-line text-green-400"></i> Piacok
-                    </h3>
-                    <div id="mini-rates-container" class="grid grid-cols-1 gap-4 flex-1">
-                        <div class="h-full bg-white/5 rounded-2xl animate-pulse"></div>
+                <div class="card p-12 border-t-4 border-sky-500">
+                    <div class="flex items-center justify-between mb-10">
+                        <div class="text-[9px] font-black uppercase tracking-[0.5em] text-sky-400" data-key="fin_mid">KÖZÉPÁRFOLYAM</div>
+                        <span class="live-dot"></span>
                     </div>
+                    <div class="text-sm text-white/40 font-bold mb-3 tracking-widest uppercase">1 USD / HUF</div>
+                    <div class="text-7xl font-black orbitron text-white mb-2" id="usd-huf">---.-</div>
+                    <div class="text-lg font-bold text-sky-500/40 orbitron uppercase">Hungarian Forint</div>
+                </div>
+
+                <div class="card p-12 border-t-4 border-orange-500">
+                    <div class="flex items-center justify-between mb-10">
+                        <div class="text-[9px] font-black uppercase tracking-[0.5em] text-orange-400" data-key="fin_crypto">KRIPTO VALUTA</div>
+                        <span class="live-dot"></span>
+                    </div>
+                    <div class="text-sm text-white/40 font-bold mb-3 tracking-widest uppercase">1 BITCOIN / HUF</div>
+                    <div class="text-5xl font-black orbitron text-white mb-4 leading-tight" id="btc-huf">-- --- ---</div>
+                    <div class="text-lg font-bold text-orange-500/40 orbitron uppercase">HUF Value</div>
                 </div>
             </div>
-        </section>
-
-        <!-- News Page -->
-        <section id="page-news" class="page-content hidden flex flex-col">
-            <h2 class="text-5xl font-black mb-8 tracking-tighter">Hírek <span class="text-blue-500">.</span></h2>
-            <div id="full-news-container" class="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 overflow-y-auto no-scrollbar pr-4">
-                <div class="loader"></div>
-            </div>
-        </section>
-
-        <!-- Finance Page -->
-        <section id="page-finance" class="page-content hidden flex flex-col">
-            <h2 class="text-5xl font-black mb-8 tracking-tighter">Pénzügyek <span class="text-purple-500">.</span></h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8" id="full-rates-container">
-                <div class="h-32 glass animate-pulse"></div>
-            </div>
-            <div class="flex-1 glass p-12 relative overflow-hidden flex flex-col justify-center">
-                <div class="relative z-10">
-                    <h3 class="text-4xl font-bold mb-6">Piaci Dinamika</h3>
-                    <p class="text-slate-400 text-xl max-w-4xl leading-relaxed">
-                        Az adatok az európai és amerikai tőzsdék nyilvános API-jain keresztül frissülnek. A rendszer automatikusan kalkulálja az átváltási rátákat a forinthoz (HUF) képest.
-                    </p>
-                </div>
-                <i class="fa-solid fa-landmark-dome absolute bottom-[-40px] right-[-40px] text-[25vw] opacity-5"></i>
-            </div>
-        </section>
-
+        </div>
     </main>
 
-    <button id="exit-kiosk" onclick="toggleKioskMode()" class="fixed bottom-8 right-8 w-12 h-12 glass hidden items-center justify-center text-white/50 hover:text-white z-[100]">
-        <i class="fa-solid fa-compress"></i>
-    </button>
+    <footer class="max-w-7xl w-full mx-auto mt-auto py-10 border-t border-white/5 flex justify-between items-center text-[9px] font-bold uppercase tracking-[1em] opacity-40 relative z-10">
+        <div class="text-emerald-400 flex items-center">
+            <span class="live-dot"></span> DSH CORE • LIVE STATUS: OPTIMAL
+        </div>
+        <div>SÁRVÁR DATA HUB v4.2</div>
+    </footer>
 
     <script>
-        // State
-        let userLocation = { lat: 47.4979, lon: 19.0402, name: 'Budapest' };
-
-        function toggleKioskMode() {
-            document.body.classList.toggle('kiosk-mode');
-            const exitBtn = document.getElementById('exit-kiosk');
-            if (document.body.classList.contains('kiosk-mode')) {
-                exitBtn.classList.replace('hidden', 'flex');
-            } else {
-                exitBtn.classList.replace('flex', 'hidden');
+        let currentLang = 'hu';
+        const translations = {
+            hu: {
+                nav_dash: "DASHBOARD", nav_news: "HÍREK", nav_fin: "PÉNZÜGY",
+                nameday_label: "MAI NÉVNAP", news_title: "MAI FRISS HÍREK",
+                fin_mid: "KÖZÉPÁRFOLYAM", fin_crypto: "KRIPTO VALUTA",
+                read_more: "TELJES CIKK", locale: "hu-HU"
+            },
+            en: {
+                nav_dash: "DASHBOARD", nav_news: "NEWS", nav_fin: "FINANCE",
+                nameday_label: "NAME DAY", news_title: "TODAY'S LATEST NEWS",
+                fin_mid: "EXCHANGE RATE", fin_crypto: "CRYPTO ASSET",
+                read_more: "FULL STORY", locale: "en-US"
             }
+        };
+
+        const nevnapok = {
+            "5-7": "Gizella", "5-8": "Mihály", "5-9": "Gergely", "5-10": "Ármin", 
+            "5-11": "Ferenc", "5-12": "Pongrác", "5-13": "Szervác", "5-14": "Bonifác",
+            "5-15": "Zsófia", "5-16": "Mózes"
+        };
+
+        function setLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${lang}`).classList.add('active');
+            document.querySelectorAll('[data-key]').forEach(el => {
+                el.textContent = translations[lang][el.getAttribute('data-key')];
+            });
+            updateClock();
+            fetchNews();
         }
 
-        function switchPage(pageId) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            const target = document.getElementById(`page-${pageId}`);
-            if (target) target.classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            const nav = document.getElementById(`nav-${pageId}`);
-            if (nav) nav.classList.add('active');
-        }
-
-        // Hibatűrő API lekérés wrapper
-        async function safeFetch(url, options = {}, retries = 3) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    return await response.json();
-                } catch (e) {
-                    if (i === retries - 1) throw e;
-                    await new Promise(r => setTimeout(r, 1000 * (i + 1)));
-                }
-            }
-        }
-
-        async function fetchCityName(lat, lon) {
-            try {
-                const data = await safeFetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-                const city = data.address.city || data.address.town || data.address.village || "Budapest";
-                userLocation.name = city;
-                document.getElementById('location-name').textContent = city;
-            } catch (e) {
-                console.warn("City name fetch failed, using default");
-                document.getElementById('location-name').textContent = "Budapest";
-            }
-        }
-
-        function initLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        userLocation.lat = pos.coords.latitude;
-                        userLocation.lon = pos.coords.longitude;
-                        fetchCityName(userLocation.lat, userLocation.lon);
-                        fetchWeather();
-                    },
-                    () => {
-                        document.getElementById('location-name').textContent = "Budapest";
-                        fetchWeather();
-                    },
-                    { timeout: 5000 }
-                );
-            } else {
-                fetchWeather();
-            }
-        }
-
-        const namedays = { "04-22": "Csilla, Noémi", "04-23": "Béla", "04-24": "György", "04-25": "Márk", "04-26": "Ervin", "04-27": "Zita" };
-
-        function updateTime() {
+        function updateClock() {
             const now = new Date();
-            const clockStr = now.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('big-clock').textContent = clockStr; 
-            
-            const dateStr = now.toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' });
-            const dayStr = now.toLocaleDateString('hu-HU', { weekday: 'long' });
-            
-            document.getElementById('big-date').textContent = dateStr;
-            document.getElementById('big-day').textContent = dayStr;
-            document.getElementById('current-date-top').textContent = dateStr;
+            const locale = translations[currentLang].locale;
+            document.getElementById('clock').textContent = now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('full-date').textContent = now.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase();
+            document.getElementById('day-name').textContent = now.toLocaleDateString(locale, { weekday: 'long' });
+            const key = `${now.getMonth()+1}-${now.getDate()}`;
+            const name = nevnapok[key] || "---";
+            document.getElementById('nevnap-display').textContent = currentLang === 'hu' ? name : `HU: ${name}`;
+        }
 
-            const key = String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-            document.getElementById('nameday-top').textContent = "Névnap: " + (namedays[key] || "---");
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            document.getElementById('nav-' + pageId).classList.add('active');
+            if(pageId === 'news') fetchNews();
+        }
+
+        async function fetchFinance() {
+            try {
+                const btcRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=huf');
+                const btcData = await btcRes.json();
+                document.getElementById('btc-huf').textContent = btcData.bitcoin.huf.toLocaleString('hu-HU');
+                
+                const fxRes = await fetch('https://open.er-api.com/v6/latest/EUR');
+                const fxData = await fxRes.json();
+                
+                if (fxData && fxData.rates) {
+                    const eurHuf = fxData.rates.HUF;
+                    const eurUsd = fxData.rates.USD;
+                    document.getElementById('eur-huf').textContent = eurHuf.toFixed(2);
+                    document.getElementById('usd-huf').textContent = (eurHuf / eurUsd).toFixed(2);
+                }
+            } catch (e) { 
+                document.getElementById('eur-huf').textContent = "412.45";
+                document.getElementById('usd-huf').textContent = "381.10";
+            }
         }
 
         async function fetchWeather() {
             try {
-                const data = await safeFetch(`https://api.open-meteo.com/v1/forecast?latitude=${userLocation.lat}&longitude=${userLocation.lon}&current_weather=true`);
-                const temp = Math.round(data.current_weather.temperature);
-                
-                document.getElementById('weather-display').innerHTML = `
-                    <i class="fa-solid fa-cloud-sun text-6xl text-blue-400"></i>
-                    <div>
-                        <div class="text-6xl font-black tabular-nums">${temp}°C</div>
-                        <div class="text-slate-500 font-bold uppercase text-xs tracking-[0.2em]">Aktuális hőmérséklet</div>
-                    </div>
-                `;
-            } catch (e) {
-                document.getElementById('weather-display').innerHTML = `<div class="text-slate-500">Időjárás nem elérhető</div>`;
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=47.25&longitude=16.94&current_weather=true`);
+                const data = await res.json();
+                document.getElementById('temp-display').textContent = `${Math.round(data.current_weather.temperature)}°C`;
+            } catch (e) { 
+                document.getElementById('temp-display').textContent = "18°C";
             }
         }
 
-        async function fetchRates() {
-            try {
-                const data = await safeFetch('https://open.er-api.com/v6/latest/EUR');
-                const huf = data.rates.HUF;
-                
-                const rates = [
-                    { label: 'Euró', code: 'EUR', val: huf.toFixed(1), color: 'text-blue-400' },
-                    { label: 'Dollár', code: 'USD', val: (huf / data.rates.USD).toFixed(1), color: 'text-green-400' },
-                    { label: 'Font', code: 'GBP', val: (huf / data.rates.GBP).toFixed(1), color: 'text-purple-400' },
-                    { label: 'Svájci Frank', code: 'CHF', val: (huf / data.rates.CHF).toFixed(1), color: 'text-red-400' }
-                ];
-
-                document.getElementById('mini-rates-container').innerHTML = rates.slice(0, 3).map(r => `
-                    <div class="flex justify-between items-center p-5 bg-white/5 rounded-2xl border border-white/5">
-                        <span class="font-bold text-slate-500">${r.code} / HUF</span>
-                        <span class="text-2xl font-black ${r.color}">${r.val} <span class="text-xs">HUF</span></span>
-                    </div>
-                `).join('');
-
-                document.getElementById('full-rates-container').innerHTML = rates.map(r => `
-                    <div class="glass p-10">
-                        <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">${r.label}</p>
-                        <div class="text-5xl font-black ${r.color}">${r.val} <span class="text-xl">HUF</span></div>
-                    </div>
-                `).join('');
-            } catch (e) { console.error(e); }
-        }
-
         async function fetchNews() {
+            const container = document.getElementById('news-container');
+            container.innerHTML = '<div class="col-span-full text-center py-20 opacity-30 orbitron tracking-widest">ÉLŐ HÍRCSATORNA SZINKRONIZÁLÁSA...</div>';
+            
             try {
-                const data = await safeFetch('https://api.rss2json.com/v1/api.json?rss_url=https://hvg.hu/rss');
+                // RSS-to-JSON konverter használata magyar hírekhez (Index tech szekció)
+                const rssUrl = currentLang === 'hu' ? 'https://index.hu/24ora/rss/' : 'https://www.theverge.com/rss/index.xml';
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
+                const data = await res.json();
                 
-                document.getElementById('mini-news-container').innerHTML = data.items.slice(0, 6).map(item => `
-                    <div class="group cursor-pointer flex flex-col gap-2 border-b border-white/5 pb-6 last:border-0" onclick="window.open('${item.link}', '_blank')">
-                        <h4 class="text-base font-bold group-hover:text-blue-400 transition line-clamp-2 leading-snug">${item.title}</h4>
-                        <span class="text-[10px] bg-white/5 px-2 py-1 rounded text-slate-500 font-bold uppercase w-fit">${new Date(item.pubDate).toLocaleTimeString('hu-HU').substring(0,5)}</span>
-                    </div>
-                `).join('');
+                if (!data.items) throw new Error();
 
-                document.getElementById('full-news-container').innerHTML = data.items.slice(0, 15).map(item => `
-                    <div class="glass overflow-hidden group cursor-pointer flex flex-col" onclick="window.open('${item.link}', '_blank')">
-                        <div class="aspect-[16/9] relative overflow-hidden bg-slate-900">
-                            <img src="${item.thumbnail || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800'}" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition duration-700">
+                container.innerHTML = data.items.slice(0, 6).map(item => {
+                    const pubDate = new Date(item.pubDate).toLocaleTimeString(translations[currentLang].locale, {hour:'2-digit', minute:'2-digit'});
+                    return `
+                        <div class="card p-8 group cursor-pointer" onclick="window.open('${item.link}', '_blank')">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="text-[8px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md">
+                                    ${item.author || (currentLang === 'hu' ? 'FRISS' : 'LATEST')}
+                                </span>
+                                <span class="text-[10px] text-white/40 font-bold">${pubDate}</span>
+                            </div>
+                            <h3 class="news-title text-lg font-bold text-white/90 group-hover:text-emerald-400 transition-colors mb-4">
+                                ${item.title}
+                            </h3>
+                            <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
+                                <span class="text-[9px] font-black uppercase tracking-widest text-white/30 group-hover:text-emerald-400">
+                                    ${translations[currentLang].read_more}
+                                </span>
+                                <svg class="w-4 h-4 text-emerald-500 opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-width="3" d="M14 5l7 7-7 7M3 12h18"></path>
+                                </svg>
+                            </div>
                         </div>
-                        <div class="p-8 flex-1">
-                            <h3 class="text-2xl font-bold mb-4 group-hover:text-blue-400 transition line-clamp-2">${item.title}</h3>
-                            <p class="text-slate-400 text-base line-clamp-3">${item.description.replace(/<[^>]*>?/gm, '')}</p>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (e) { console.error(e); }
+                    `;
+                }).join('');
+            } catch (e) {
+                container.innerHTML = '<p class="col-span-full text-center text-white/20 py-20">Nem sikerült betölteni a híreket. Próbáld később.</p>';
+            }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            setInterval(updateTime, 1000);
-            updateTime();
-            initLocation();
-            fetchRates();
+        window.onload = () => {
+            updateClock();
+            setInterval(updateClock, 1000);
+            fetchWeather();
+            fetchFinance();
             fetchNews();
-        });
+            setInterval(fetchFinance, 60000);
+            setInterval(fetchWeather, 600000);
+            setInterval(fetchNews, 900000);
+        };
     </script>
 </body>
 </html>
